@@ -172,3 +172,4 @@ cython_debug/
 
 
 ny_taxi_postgres_data/
+*.parquet
