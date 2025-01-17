@@ -50,3 +50,18 @@ python ingest_data.py \
   --db_name=ny_taxi \
   --table_name=yellow_taxi_data \
   --url=${URL}
+
+# build and run ingest image
+docker build -t taxi_ingest:v001 .
+
+URL="https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2021-01.parquet"
+docker run -it --rm \
+  --network=pg-network \
+  taxi_ingest:v001 \
+  --user=root \
+  --password=root \
+  --host=pg-database \
+  --port=5432 \
+  --db_name=ny_taxi \
+  --table_name=yellow_taxi_data \
+  --url=${URL}
