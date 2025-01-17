@@ -40,3 +40,13 @@ docker run --rm -it \
   --network=pg-network \
   --name=pg-admin \
 dpage/pgadmin4
+
+URL="https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2021-01.parquet"
+python ingest_data.py \
+  --user=root \
+  --password=root \
+  --host=localhost \
+  --port=5433 \
+  --db_name=ny_taxi \
+  --table_name=yellow_taxi_data \
+  --url=${URL}
