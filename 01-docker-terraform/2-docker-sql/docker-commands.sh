@@ -65,3 +65,29 @@ docker run -it --rm \
   --db_name=ny_taxi \
   --table_name=yellow_taxi_data \
   --url=${URL}
+
+# run the ingest script against the custom network
+URL="https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2021-01.parquet"
+docker run -it --rm \
+  --network=postgres-network \
+  taxi_ingest:v001 \
+  --user=root \
+  --password=root \
+  --host=database \
+  --port=5432 \
+  --db_name=ny_taxi \
+  --table_name=yellow_taxi_data \
+  --url=${URL}
+
+# run the loop ingest script against the network
+URL="https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"
+docker run -it --rm \
+  --network=postgres-network \
+  taxi_zones_ingest:v001 \
+  --user=root \
+  --password=root \
+  --host=database \
+  --port=5432 \
+  --db_name=ny_taxi \
+  --table_name=taxi_zones_lookup \
+  --url=${URL}

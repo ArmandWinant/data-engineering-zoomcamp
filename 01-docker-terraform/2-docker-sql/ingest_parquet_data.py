@@ -47,7 +47,7 @@ def main(params):
 
 
 if __name__=="__main__":
-  parser = argparse.ArgumentParser(description='Ingest CSV data to Postgres')
+  parser = argparse.ArgumentParser(description='Ingest Parquet data to Postgres')
 
   parser.add_argument('--user', help='postgres username')
   parser.add_argument('--password', help='postgres password')
