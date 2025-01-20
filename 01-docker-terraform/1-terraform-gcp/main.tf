@@ -10,7 +10,7 @@ terraform {
 provider "google" {
   project     = var.project_id
   region      = var.region
-  credentials = "./keys/my-creds.json"
+  credentials = file(var.credentials)
 }
 
 resource "google_storage_bucket" "demo-bucket" {
