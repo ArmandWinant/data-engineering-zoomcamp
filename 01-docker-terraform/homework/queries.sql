@@ -21,5 +21,27 @@ ORDER BY 2 DESC
 LIMIT 1;
 
 -- QUESTION 5 - Three Biggest Pickup Zones
+SELECT
+	z.zone,
+	SUM(total_amount) AS total_amount
+FROM green_taxi_data t
+JOIN taxi_zones_lookup z
+ON z.location_id = t.pickup_location_id
+WHERE date_part('day', lpep_pickup_datetime) = 18
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 3;
 
 -- QUESTION 6 - Largest Trip
+SELECT
+	do_z.zone,
+	MAX(tip_amount) AS max_tip
+FROM green_taxi_data t
+JOIN taxi_zones_lookup pu_z
+ON pu_z.location_id = t.pickup_location_id
+JOIN taxi_zones_lookup do_z
+ON do_z.location_id = t.dropoff_location_id
+WHERE pu_z.zone = 'East Harlem North'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
