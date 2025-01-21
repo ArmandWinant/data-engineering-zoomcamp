@@ -91,3 +91,32 @@ docker run -it --rm \
   --db_name=ny_taxi \
   --table_name=taxi_zones_lookup \
   --url=${URL}
+
+# HOMEWORK COMMANDS
+docker build -t taxi_zones_ingest:v001 -f Dockerfile_zones .
+
+URL="https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"
+docker run -it --rm \
+  --network=homework_default \
+  taxi_zones_ingest:v001 \
+  --user=postgres \
+  --password=postgres \
+  --host=postgres \
+  --port=5432 \
+  --db_name=ny_taxi \
+  --table_name=taxi_zones_lookup \
+  --url=${URL}
+  
+docker build -t taxi_trips_ingest:v001 -f Dockerfile_trips .
+
+URL="https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2019-10.parquet"
+docker run -it --rm \
+  --network=homework_default \
+  taxi_trips_ingest:v001 \
+  --user=postgres \
+  --password=postgres \
+  --host=postgres \
+  --port=5432 \
+  --db_name=ny_taxi \
+  --table_name=green_taxi_data \
+  --url=${URL}
