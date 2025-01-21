@@ -15,6 +15,12 @@ def transform_load_csv(csv_file, engine, table_name, overwrite=False):
   for i, batch_df in enumerate(iterator):
     t_start = time()
 
+    batch_df.rename(columns={
+      'LocationID': 'location_id',
+      'Borough': 'borough',
+      'Zone': 'zone'
+    }, inplace=True)
+
     if_exists = 'replace' if i == 0 and overwrite else 'append'
     batch_df.to_sql(con=engine, name=table_name, if_exists=if_exists, index=False)
     

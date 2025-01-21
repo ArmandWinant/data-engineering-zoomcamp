@@ -18,6 +18,13 @@ def transform_load_parquet(parquet_file, engine, table_name, overwrite=False):
     t_start = time()
     batch_df = batch.to_pandas()
 
+    batch_df.rename(columns={
+      'VendorID': 'vendor_id',
+      'RatecodeID': 'ratecode_id',
+      'PULocationID': 'pickup_location_id',
+      'DOLocationID': 'dropoff_location_id'
+    }, inplace=True)
+
     if_exists = 'replace' if i == 0 and overwrite else 'append'
     batch_df.to_sql(con=engine, name=table_name, if_exists=if_exists, index=False)
     
