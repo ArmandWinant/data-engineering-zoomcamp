@@ -2,16 +2,6 @@ id: gcp_kv
 namespace: zoomcamp
 
 tasks:
-  - id: gcp_creds
-    type: io.kestra.plugin.core.kv.Set
-    key: GCP_CREDS
-    kvType: JSON
-    value: |
-      {
-        "type": "service_account",
-        "project_id": "..."
-      }
-  
   - id: gcp_project_id
     type: io.kestra.plugin.core.kv.Set
     key: GCP_PROJECT_ID
@@ -34,4 +24,4 @@ tasks:
     type: io.kestra.plugin.core.kv.Set
     key: GCP_DATASET
     kvType: STRING
-    value: de-zoomcamp-nyc-taxi
+    value: de_zoomcamp_nyc_taxi
