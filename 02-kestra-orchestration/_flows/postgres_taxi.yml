@@ -41,3 +41,66 @@ tasks:
       type: io.kestra.plugin.core.runner.Process
     commands:
       - wget -qO - https://www.github.com/DataTalksClub/nyc-tlc-data/releases/download/{{inputs.taxi}}/{{render(vars.file)}}.gz | gunzip > {{render(vars.file)}}
+      
+  - id: green_create_table
+    type: io.kestra.plugin.jdbc.postgresql.Queries
+    sql: |
+      CREATE TABLE IF NOT EXISTS {{render(vars.table)}} (
+        unique_row_id TEXT,
+        filename TEXT,
+        VendorID TEXT,
+        lpep_pickup_datetime TIMESTAMP,
+        lpep_dropoff_datetime TIMESTAMP,
+        store_and_fwd_flag CHAR,
+        RateCodeID TEXT,
+        PULocationID TEXT,
+        DOLocationID TEXT,
+        passenger_count INTEGER,
+        trip_distance DOUBLE PRECISION,
+        fare_amount DOUBLE PRECISION,
+        extra DOUBLE PRECISION,
+        mta_tax DOUBLE PRECISION,
+        tip_amount DOUBLE PRECISION,
+        tolls_amount DOUBLE PRECISION,
+        ehail_fee DOUBLE PRECISION,
+        improvement_surcharge DOUBLE PRECISION,
+        total_amount DOUBLE PRECISION,
+        payment_type INTEGER,
+        trip_type INTEGER,
+        congestion_surcharge DOUBLE PRECISION
+      );
+
+  - id: green_create_staging_table
+    type: io.kestra.plugin.jdbc.postgresql.Queries
+    sql: |
+      CREATE TABLE IF NOT EXISTS {{render(vars.staging_table)}} (
+        unique_row_id TEXT,
+        filename TEXT,
+        VendorID TEXT,
+        lpep_pickup_datetime TIMESTAMP,
+        lpep_dropoff_datetime TIMESTAMP,
+        store_and_fwd_flag CHAR,
+        RateCodeID TEXT,
+        PULocationID TEXT,
+        DOLocationID TEXT,
+        passenger_count INTEGER,
+        trip_distance DOUBLE PRECISION,
+        fare_amount DOUBLE PRECISION,
+        extra DOUBLE PRECISION,
+        mta_tax DOUBLE PRECISION,
+        tip_amount DOUBLE PRECISION,
+        tolls_amount DOUBLE PRECISION,
+        ehail_fee DOUBLE PRECISION,
+        improvement_surcharge DOUBLE PRECISION,
+        total_amount DOUBLE PRECISION,
+        payment_type INTEGER,
+        trip_type INTEGER,
+        congestion_surcharge DOUBLE PRECISION
+      );
+
+pluginDefaults:
+  - type: io.kestra.plugin.jdbc.postgresql
+    values:
+      url: jdbc:postgresql://host.docker.internal:5432/kestra
+      username: kestra
+      password: k3str4
