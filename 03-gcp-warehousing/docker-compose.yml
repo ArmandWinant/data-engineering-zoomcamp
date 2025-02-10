@@ -18,6 +18,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 10
+    ports:
+      - 5432:5432
 
   kestra:
     image: kestra/kestra:latest
@@ -31,6 +33,7 @@ services:
       - kestra-data:/app/storage
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/kestra-wd:/tmp/kestra-wd
+    env_file: ".env"
     environment:
       KESTRA_CONFIGURATION: |
         datasources:
@@ -53,6 +56,8 @@ services:
               basePath: "/app/storage"
           queue:
             type: postgres
+          tutorial-flows:
+            enabled: false
           tasks:
             tmpDir:
               path: /tmp/kestra-wd/tmp
