@@ -24,8 +24,6 @@ inputs:
 variables:
   file: "{{inputs.taxi}}_tripdata_{{inputs.year}}-{{inputs.month}}.parquet"
   gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{vars.file}}"
-  table: "{{kv('GCP_DATASET')}}.{{inputs.taxi}}_tripdata_{{inputs.year}}_{{inputs.month}}"
-  data: "{{outputs.extract.outputFiles[inputs.taxi ~ '_tripdata_' ~ inputs.year ~ '-' ~ inputs.month ~ '.parquet']}}"
 
 tasks:
   - id: set_label
@@ -34,19 +32,19 @@ tasks:
       file: "{{render(vars.file)}}"
       taxi: "{{inputs.taxi}}"
 
-  - id: extract
-    type: io.kestra.plugin.scripts.shell.Commands
-    outputFiles:
-      - "*.csv"
-    taskRunner:
-      type: io.kestra.plugin.core.runner.Process
-    commands:
-      - wget -qO- https://d37ci6vzurychx.cloudfront.net/trip-data/{{inputs.taxi}}_tripdata_{{inputs.year}}-{{inputs.month}}.parquet
+  - id: download_file
+    type: io.kestra.plugin.core.http.Download
+    uri: "https://d37ci6vzurychx.cloudfront.net/trip-data/{{inputs.taxi}}_tripdata_{{inputs.year}}-{{inputs.month}}.parquet"
   
   - id: upload_to_gcs
     type: io.kestra.plugin.gcp.gcs.Upload
-    from: "{{render(vars.data)}}"
+    from: "{{ outputs.download_file.uri }}"
     to: "{{render(vars.gcs_file)}}"
+
+  - id: purge_files
+    type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
+    description: If you'd like to explore Kestra outputs, disable it.
+    disabled: false
 
 pluginDefaults:
   - type: io.kestra.plugin.gcp
