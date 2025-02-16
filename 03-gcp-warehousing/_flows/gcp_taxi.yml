@@ -112,7 +112,13 @@ tasks:
           df = pd.read_parquet("{{ outputs.download_file.uri }}")
           df.replace({np.nan: None}, inplace=True)
 
-          df.PUlocationID = pd.to_numeric(df.PUlocationID.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.rename(columns={
+            'PUlocationID': 'PULocationID',
+            'DOlocationID': 'DOLocationID',
+            'dropOff_datetime': 'dropoff_datetime'
+          }, inplace=True)
+
+          df.PULocationID = pd.to_numeric(df.PULocationID.round(), errors='coerce').astype(pd.Int64Dtype())
           df.DOLocationID = pd.to_numeric(df.DOLocationID.round(), errors='coerce').astype(pd.Int64Dtype())
           df.SR_Flag = pd.to_numeric(df.SR_Flag.round(), errors='coerce').astype(pd.Int64Dtype())
           
