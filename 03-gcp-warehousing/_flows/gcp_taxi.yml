@@ -55,6 +55,11 @@ tasks:
           
           df.to_parquet("{{ render(vars.file) }}")
 
+      - id: yellow_upload_to_gcs
+        type: io.kestra.plugin.gcp.gcs.Upload
+        from: "{{outputs.yellow_parquet_transform.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.parquet']}}"
+        to: "{{render(vars.gcs_file)}}"
+
   - id: if_green_taxi
     type: io.kestra.plugin.core.flow.If
     condition: "{{inputs.taxi == 'green'}}"
@@ -83,6 +88,11 @@ tasks:
           
           df.to_parquet("{{ render(vars.file) }}")
 
+      - id: green_upload_to_gcs
+        type: io.kestra.plugin.gcp.gcs.Upload
+        from: "{{outputs.green_parquet_transform.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.parquet']}}"
+        to: "{{render(vars.gcs_file)}}"
+
   - id: if_fhv
     type: io.kestra.plugin.core.flow.If
     condition: "{{inputs.taxi == 'fhv'}}"
@@ -108,10 +118,10 @@ tasks:
           
           df.to_parquet("{{ render(vars.file) }}")
 
-  - id: upload_to_gcs
-    type: io.kestra.plugin.gcp.gcs.Upload
-    from: "{{ render(vars.data) }}"
-    to: "{{render(vars.gcs_file)}}"
+      - id: fhv_upload_to_gcs
+        type: io.kestra.plugin.gcp.gcs.Upload
+        from: "{{outputs.fhv_parquet_transform.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.parquet']}}"
+        to: "{{render(vars.gcs_file)}}"
 
   - id: purge_files
     type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
