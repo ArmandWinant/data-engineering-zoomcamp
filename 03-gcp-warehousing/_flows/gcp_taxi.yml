@@ -8,7 +8,7 @@ inputs:
   - id: taxi
     type: SELECT
     displayName: Select taxi type
-    values: [yellow, green]
+    values: [yellow, green, fhv]
     defaults: green
 
 variables:
@@ -28,43 +28,106 @@ tasks:
     type: io.kestra.plugin.core.http.Download
     uri: "{{ render(vars.file_url) }}"
 
-  # - id: upload_to_gcs
-  #   type: io.kestra.plugin.gcp.gcs.Upload
-  #   from: "{{ outputs.download_file.uri }}"
-  #   to: "{{ render(vars.gcs_file) }}"
-    
-  - id: parquet_transform
-    type: io.kestra.plugin.scripts.python.Script
-    warningOnStdErr: false
-    taskRunner:
-      type: io.kestra.plugin.scripts.runner.docker.Docker
-    containerImage: ghcr.io/kestra-io/pydata:latest
-    outputFiles:
-      - "{{ render(vars.file) }}"
-    script: |
-      import numpy as np
-      import pandas as pd
+  - id: if_yellow_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'yellow'}}"
+    then:  
+      - id: yellow_parquet_transform
+        type: io.kestra.plugin.scripts.python.Script
+        warningOnStdErr: false
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+        containerImage: ghcr.io/kestra-io/pydata:latest
+        outputFiles:
+          - "{{ render(vars.file) }}"
+        script: |
+          import numpy as np
+          import pandas as pd
 
-      df = pd.read_parquet("{{ outputs.download_file.uri }}")
-      df.replace({np.nan: None}, inplace=True)
+          df = pd.read_parquet("{{ outputs.download_file.uri }}")
+          df.replace({np.nan: None}, inplace=True)
 
-      df.RatecodeID = pd.to_numeric(df.RatecodeID.round(), errors='coerce').astype(pd.Int64Dtype())
-      df.passenger_count = pd.to_numeric(df.passenger_count.round(), errors='coerce').astype(pd.Int64Dtype())
-      df.payment_type = pd.to_numeric(df.payment_type.round(), errors='coerce').astype(pd.Int64Dtype())
-      df.congestion_surcharge = pd.to_numeric(df.congestion_surcharge.round(), errors='coerce').astype(pd.Float64Dtype())
+          df.RatecodeID = pd.to_numeric(df.RatecodeID.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.passenger_count = pd.to_numeric(df.passenger_count.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.payment_type = pd.to_numeric(df.payment_type.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.congestion_surcharge = pd.to_numeric(df.congestion_surcharge.round(), errors='coerce').astype(pd.Float64Dtype())
+          df.airport_fee = pd.to_numeric(df.airport_fee.round(), errors='coerce').astype(pd.Float64Dtype())
+          
+          df.to_parquet("{{ render(vars.file) }}")
 
-      if "{{inputs.taxi}}" == "green":
-        df.ehail_fee = pd.to_numeric(df.ehail_fee.round(), errors='coerce').astype(pd.Float64Dtype())
-        df.trip_type = pd.to_numeric(df.trip_type.round(), errors='coerce').astype(pd.Int64Dtype())
-      elif "{{inputs.taxi}}" == "yellow":
-        df.airport_fee = pd.to_numeric(df.airport_fee.round(), errors='coerce').astype(pd.Float64Dtype())
-      
-      df.to_parquet("{{ render(vars.file) }}")
+      - id: yellow_upload_to_gcs
+        type: io.kestra.plugin.gcp.gcs.Upload
+        from: "{{outputs.yellow_parquet_transform.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.parquet']}}"
+        to: "{{render(vars.gcs_file)}}"
 
-  - id: upload_to_gcs
-    type: io.kestra.plugin.gcp.gcs.Upload
-    from: "{{ render(vars.data) }}"
-    to: "{{render(vars.gcs_file)}}"
+  - id: if_green_taxi
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'green'}}"
+    then:  
+      - id: green_parquet_transform
+        type: io.kestra.plugin.scripts.python.Script
+        warningOnStdErr: false
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+        containerImage: ghcr.io/kestra-io/pydata:latest
+        outputFiles:
+          - "{{ render(vars.file) }}"
+        script: |
+          import numpy as np
+          import pandas as pd
+
+          df = pd.read_parquet("{{ outputs.download_file.uri }}")
+          df.replace({np.nan: None}, inplace=True)
+
+          df.RatecodeID = pd.to_numeric(df.RatecodeID.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.passenger_count = pd.to_numeric(df.passenger_count.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.payment_type = pd.to_numeric(df.payment_type.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.congestion_surcharge = pd.to_numeric(df.congestion_surcharge.round(), errors='coerce').astype(pd.Float64Dtype())
+          df.ehail_fee = pd.to_numeric(df.ehail_fee.round(), errors='coerce').astype(pd.Float64Dtype())
+          df.trip_type = pd.to_numeric(df.trip_type.round(), errors='coerce').astype(pd.Int64Dtype())
+          
+          df.to_parquet("{{ render(vars.file) }}")
+
+      - id: green_upload_to_gcs
+        type: io.kestra.plugin.gcp.gcs.Upload
+        from: "{{outputs.green_parquet_transform.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.parquet']}}"
+        to: "{{render(vars.gcs_file)}}"
+
+  - id: if_fhv
+    type: io.kestra.plugin.core.flow.If
+    condition: "{{inputs.taxi == 'fhv'}}"
+    then:  
+      - id: fhv_parquet_transform
+        type: io.kestra.plugin.scripts.python.Script
+        warningOnStdErr: false
+        taskRunner:
+          type: io.kestra.plugin.scripts.runner.docker.Docker
+        containerImage: ghcr.io/kestra-io/pydata:latest
+        outputFiles:
+          - "{{ render(vars.file) }}"
+        script: |
+          import numpy as np
+          import pandas as pd
+
+          df = pd.read_parquet("{{ outputs.download_file.uri }}")
+          df.replace({np.nan: None}, inplace=True)
+
+          df.rename(columns={
+            'PUlocationID': 'PULocationID',
+            'DOlocationID': 'DOLocationID',
+            'dropOff_datetime': 'dropoff_datetime'
+          }, inplace=True)
+
+          df.PULocationID = pd.to_numeric(df.PULocationID.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.DOLocationID = pd.to_numeric(df.DOLocationID.round(), errors='coerce').astype(pd.Int64Dtype())
+          df.SR_Flag = pd.to_numeric(df.SR_Flag.round(), errors='coerce').astype(pd.Int64Dtype())
+          
+          df.to_parquet("{{ render(vars.file) }}")
+
+      - id: fhv_upload_to_gcs
+        type: io.kestra.plugin.gcp.gcs.Upload
+        from: "{{outputs.fhv_parquet_transform.outputFiles[inputs.taxi ~ '_tripdata_' ~ (trigger.date | date('yyyy-MM')) ~ '.parquet']}}"
+        to: "{{render(vars.gcs_file)}}"
 
   - id: purge_files
     type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
@@ -91,3 +154,9 @@ triggers:
     cron: "0 10 1 * *"
     inputs:
       taxi: yellow
+
+  - id: fhv_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 11 1 * *"
+    inputs:
+      taxi: fhv
