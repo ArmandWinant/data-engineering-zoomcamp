@@ -225,12 +225,12 @@ tasks:
   - id: drop_bq_table_ext
     type: io.kestra.plugin.gcp.bigquery.Query
     sql: |
-      DROP TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext;`
+      DROP TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`
   
   - id: drop_bq_table_tmp
     type: io.kestra.plugin.gcp.bigquery.Query
     sql: |
-      DROP TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}};`
+      DROP TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}`
 
   - id: purge_files
     type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
