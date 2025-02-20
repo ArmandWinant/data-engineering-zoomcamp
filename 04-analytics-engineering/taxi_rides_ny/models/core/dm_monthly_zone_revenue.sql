@@ -4,7 +4,7 @@ with trips_data as (
     select 
     -- Revenue grouping 
     pickup_zone as revenue_zone,
-    year || '-' || LPAD(CAST(month AS STRING), 2, '0') AS revenue_month,
+    month AS revenue_month,
     service_type, 
 
     -- Revenue calculation 
