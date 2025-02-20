@@ -1,5 +1,3 @@
-version: 2
-
 models:
   - name: dim_zones
     description: >
