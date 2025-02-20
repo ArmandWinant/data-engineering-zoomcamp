@@ -44,9 +44,9 @@ select
     trips_unioned.total_amount, 
     trips_unioned.payment_type, 
     trips_unioned.payment_type_description,
-    extract(year FROM trips_unioned.pickup_datetime) as year,
-    extract(quarter FROM trips_unioned.pickup_datetime) as quarter,
-    extract(month FROM trips_unioned.pickup_datetime) as month
+    {{ dbt.date_trunc("year", "pickup_datetime") }} as year,
+    {{ dbt.date_trunc("quarter", "pickup_datetime") }} as quarter,
+    {{ dbt.date_trunc("month", "pickup_datetime") }} as month
 from trips_unioned
 inner join dim_zones as pickup_zone
 on trips_unioned.pickup_locationid = pickup_zone.locationid

@@ -7,7 +7,7 @@ with tripdata as
 )
 select
     -- identifiers
-    unique_row_id AS tripid,
+    unique_row_id as tripid,
     {{ dbt.safe_cast("vendorid", api.Column.translate_type("integer")) }} as vendorid,
     {{ dbt.safe_cast("ratecodeid", api.Column.translate_type("integer")) }} as ratecodeid,
     {{ dbt.safe_cast("pulocationid", api.Column.translate_type("integer")) }} as pickup_locationid,
