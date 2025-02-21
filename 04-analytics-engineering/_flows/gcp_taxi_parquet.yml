@@ -1,0 +1,52 @@
+id: gcp_taxi_parquet
+namespace: null
+
+inputs:
+  - id: taxi
+    type: SELECT
+    displayName: Select taxi type
+    values: [yellow, green, fhv]
+    defaults: green
+
+variables:
+  file: "{{inputs.taxi}}_tripdata_{{trigger.date | date('yyyy-MM')}}.parquet"
+  uri: "https://d37ci6vzurychx.cloudfront.net/trip-data/{{ render(vars.file) }}"
+  gcs_file: "gs://{{kv('GCP_BUCKET_NAME')}}/{{vars.file}}"
+  table: "{{kv('GCP_DATASET')}}.{{inputs.taxi}}_tripdata_{{trigger.date | date('yyyy_MM')}}"
+
+tasks:
+  - id: extract
+    type: io.kestra.plugin.core.http.Download
+    uri: "{{ render(vars.uri) }}"
+
+  - id: upload_to_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{ outputs.extract.uri }}"
+    to: "{{render(vars.gcs_file)}}"
+
+pluginDefaults:
+  - type: io.kestra.plugin.gcp
+    values:
+      serviceAccount: "{{kv('GCP_CREDS')}}"
+      projectId: "{{kv('GCP_PROJECT_ID')}}"
+      location: "{{kv('GCP_LOCATION')}}"
+      bucket: "{{kv('GCP_BUCKET_NAME')}}"
+
+triggers:
+  - id: green_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 9 1 * *"
+    inputs:
+      taxi: green
+
+  - id: yellow_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 10 1 * *"
+    inputs:
+      taxi: yellow
+  
+  - id: fhv_schedule
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 11 1 * *"
+    inputs:
+      taxi: fhv
