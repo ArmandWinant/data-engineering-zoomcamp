@@ -12,8 +12,10 @@ for MONTH in {1..12}; do
   LOCAL_FILE="${TAXI_TYPE}_tripdata_${YEAR}_${FMONTH}.parquet"
   LOCAL_PATH="${LOCAL_PREFIX}/${LOCAL_FILE}"
 
+  echo "downloading ${URL} to ${LOCAL_PATH}"
   mkdir -p ${LOCAL_PREFIX}
   curl -s ${URL} -o ${LOCAL_PATH}
 
+  echo "compressing ${LOCAL_FILE}"
   gzip ${LOCAL_PATH}
 done
