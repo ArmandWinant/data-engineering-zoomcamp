@@ -17,5 +17,5 @@ for MONTH in {1..12}; do
   curl -s ${URL} -o ${LOCAL_PATH}
 
   echo "compressing ${LOCAL_FILE}"
-  gzip ${LOCAL_PATH}
+  # gzip ${LOCAL_PATH}
 done
