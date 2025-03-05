@@ -175,6 +175,8 @@ ny_taxi_postgres_data/
 *.parquet
 *.csv
 *.gz
+*.crc
+_SUCCESS
 
 keys/
 
@@ -215,3 +217,5 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+.DS_Store
