@@ -16,6 +16,5 @@ for MONTH in {1..12}; do
 
   echo "downloading ${URL} to ${LOCAL_PATH}"
   mkdir -p ${LOCAL_PREFIX}
-  wget ${URL} -O ${LOCAL_PATH}
-
+  curl -s ${URL} -o ${LOCAL_PATH}
 done
