@@ -16,5 +16,5 @@ for MONTH in {1..12}; do
 
   echo "downloading ${URL} to ${LOCAL_PATH}"
   mkdir -p ${LOCAL_PREFIX}
-  curl -s ${URL} -o ${LOCAL_PATH}
+  curl -sL ${URL} -o ${LOCAL_PATH}
 done
