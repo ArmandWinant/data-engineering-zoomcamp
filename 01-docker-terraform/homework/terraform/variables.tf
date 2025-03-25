@@ -8,7 +8,7 @@ variable "credentials" {
 
 variable "project" {
   description = "Project"
-  default     = "durable-cacao-448302-v7"
+  default     = "sacred-choir-454809-s9"
 }
 
 variable "region" {
@@ -32,7 +32,7 @@ variable "bq_dataset_name" {
 variable "gcs_bucket_name" {
   description = "My Storage Bucket Name"
   #Update the below to a unique bucket name
-  default     = "durable-cacao-448302-v7-module-1-bucket"
+  default     = "sacred-choir-454809-s9-module-1-bucket"
 }
 
 variable "gcs_storage_class" {

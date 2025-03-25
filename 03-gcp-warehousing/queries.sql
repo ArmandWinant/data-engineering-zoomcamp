@@ -1,7 +1,7 @@
 CREATE OR REPLACE EXTERNAL TABLE `de_zoomcamp_nyc_taxi.external_yellow_tripdata`
 OPTIONS (
   format = 'PARQUET',
-  uris = ['gs://de-zoomcamp-nyc-taxi-durable-cacao-448302-v7/yellow_tripdata_*.parquet']
+  uris = ['gs://de-zoomcamp-nyc-taxi-sacred-choir-454809-s9/yellow_tripdata_*.parquet']
 );
 
 CREATE OR REPLACE TABLE `de_zoomcamp_nyc_taxi.yellow_tripdata_non_partitioned`
