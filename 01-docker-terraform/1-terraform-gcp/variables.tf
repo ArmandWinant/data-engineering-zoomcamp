@@ -1,6 +1,6 @@
 variable "project_id" {
   description = "Project ID"
-  default     = "durable-cacao-448302-v7"
+  default     = "sacred-choir-454809-s9"
 }
 
 variable "credentials" {
@@ -25,7 +25,7 @@ variable "bq_dataset_name" {
 
 variable "gcs_bucket_name" {
   description = "Storage Bucket Name"
-  default     = "durable-cacao-448302-v7-terraform-bucket"
+  default     = "sacred-choir-454809-s9-terraform-bucket"
 }
 
 variable "gcs_storage_class" {
