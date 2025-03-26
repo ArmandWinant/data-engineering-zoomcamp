@@ -25,6 +25,7 @@ tasks:
       taxi: "{{inputs.taxi}}"
 
   - id: extract
+    description: retrieve and unzip data file
     type: io.kestra.plugin.scripts.shell.Commands
     outputFiles:
       - "*.csv"
@@ -34,6 +35,7 @@ tasks:
       - wget -qO- https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{{inputs.taxi}}/{{render(vars.file)}}.gz | gunzip > {{render(vars.file)}}
 
   - id: upload_to_gcs
+    description: upload data file to google cloud storage
     type: io.kestra.plugin.gcp.gcs.Upload
     from: "{{render(vars.data)}}"
     to: "{{render(vars.gcs_file)}}"
@@ -43,6 +45,7 @@ tasks:
     condition: "{{inputs.taxi == 'yellow'}}"
     then:
       - id: bq_yellow_tripdata
+        description: create permanent partitioned table if it does not exist
         type: io.kestra.plugin.gcp.bigquery.Query
         sql: |
           CREATE TABLE IF NOT EXISTS `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.yellow_tripdata`
@@ -71,6 +74,7 @@ tasks:
           PARTITION BY DATE(tpep_pickup_datetime);
 
       - id: bq_yellow_table_ext
+        description: create external table from bucket file
         type: io.kestra.plugin.gcp.bigquery.Query
         sql: |
           CREATE OR REPLACE EXTERNAL TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`
@@ -102,6 +106,7 @@ tasks:
           );
 
       - id: bq_yellow_table_tmp
+        description: create staging table from external table
         type: io.kestra.plugin.gcp.bigquery.Query
         sql: |
           CREATE OR REPLACE TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}`
@@ -119,6 +124,7 @@ tasks:
           FROM `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`;
 
       - id: bq_yellow_merge
+        description: perform upsert step into production table
         type: io.kestra.plugin.gcp.bigquery.Query
         sql: |
           MERGE INTO `{{kv('GCP_PROJECT_ID')}}.{{kv('GCP_DATASET')}}.yellow_tripdata` T
@@ -292,16 +298,19 @@ tasks:
             VALUES (S.unique_row_id, S.filename, S.dispatching_base_num, S.pickup_datetime, S.dropoff_datetime, S.PULocationID, S.DOLocationID, S.SR_flag, S.affiliated_base_number);
 
   - id: drop_bq_table_ext
+    description: drop external table
     type: io.kestra.plugin.gcp.bigquery.Query
     sql: |
       DROP TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}_ext`
   
   - id: drop_bq_table_tmp
+    description: drop staging table
     type: io.kestra.plugin.gcp.bigquery.Query
     sql: |
       DROP TABLE `{{kv('GCP_PROJECT_ID')}}.{{render(vars.table)}}`
 
   - id: purge_files
+    description: remove data file
     type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
     description: To avoid cluttering your storage, we will remove the downloaded files
 
