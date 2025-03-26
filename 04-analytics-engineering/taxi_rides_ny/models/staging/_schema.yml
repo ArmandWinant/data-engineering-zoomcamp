@@ -1,3 +1,4 @@
+# dbt --quiet run-operation generate_source --args '{"schema_name": "staging", "database_name": "sacred-choir-454809-s9", "table_names": ["green_tripdata", "yellow_tripdata"]}' > models/staging/_schema.yml
 version: 2
 
 sources:
