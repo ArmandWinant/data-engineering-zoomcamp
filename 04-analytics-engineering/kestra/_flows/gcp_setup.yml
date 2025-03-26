@@ -1,5 +1,5 @@
 id: gcp_setup
-namespace: null
+namespace: zoomcamp
 
 tasks:
   - id: create_gcs_bucket

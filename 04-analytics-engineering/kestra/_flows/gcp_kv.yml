@@ -1,5 +1,5 @@
 id: gcp_kv
-namespace: null
+namespace: zoomcamp
 
 tasks:
   - id: gcp_project_id
