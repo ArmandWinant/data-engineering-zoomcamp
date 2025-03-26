@@ -1,0 +1,8 @@
+# dbt --quiet run-operation generate_source --args '{"database_name": "sacred-choir-454809-s9", "schema_name": "de_zoomcamp_nyc_taxi", table_names: ["green_tripdata", "yellow_tripdata"]}' > models/staging/_sources.yml
+version: 2
+
+sources:
+  - name: de_zoomcamp_nyc_taxi
+    tables:
+      - name: green_tripdata
+      - name: yellow_tripdata
