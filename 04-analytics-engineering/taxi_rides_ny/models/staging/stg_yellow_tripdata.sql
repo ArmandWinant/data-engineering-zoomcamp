@@ -1,10 +1,8 @@
--- dbt --quiet run-operation generate_base_model --args '{"source_name": "de_zoomcamp_nyc_taxi", "table_name": "yellow_tripdata"}' > models/staging/stg_yellow_tripdata.sql
-
 with tripdata as 
 (
   select *,
     row_number() over(partition by vendorid, tpep_pickup_datetime) as rn
-  from {{ source('de_zoomcamp_nyc_taxi','yellow_tripdata') }}
+  from {{ source('staging','yellow_tripdata') }}
   where vendorid is not null 
 )
 select
