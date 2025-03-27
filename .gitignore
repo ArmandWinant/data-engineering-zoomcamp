@@ -219,3 +219,4 @@ override.tf.json
 terraform.rc
 
 .DS_Store
+05-batch-processing/commands.txt
