@@ -14,7 +14,6 @@ input_yellow = args.input_yellow
 output = args.output
 
 spark = SparkSession.builder\
-          .master("spark://Bastiens-MacBook-Pro.local:7077")\
           .appName("test")\
           .getOrCreate()
 
