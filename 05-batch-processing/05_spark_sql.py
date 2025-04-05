@@ -1,16 +1,29 @@
 from pyspark.sql import SparkSession, functions as F
+import argparse
+
+parser = argparse.ArgumentParser(description='Ingest CSV data to Postgres')
+
+parser.add_argument('--input_green', required=True)
+parser.add_argument('--input_yellow', required=True)
+parser.add_argument('--output', required=True)
+
+args = parser.parse_args()
+
+input_green = args.input_green
+input_yellow = args.input_yellow
+output = args.output
 
 spark = SparkSession.builder\
           .master("spark://Bastiens-MacBook-Pro.local:7077")\
           .appName("test")\
           .getOrCreate()
 
-df_green = spark.read.parquet('./data/pq/green/*/*')
+df_green = spark.read.parquet(input_green)
 df_green = df_green\
             .withColumnRenamed('lpep_pickup_datetime', 'pickup_datetime')\
             .withColumnRenamed('lpep_dropoff_datetime', 'dropoff_datetime')
 
-df_yellow = spark.read.parquet('./data/pq/yellow/*/*')
+df_yellow = spark.read.parquet(input_yellow)
 df_yellow = df_yellow\
             .withColumnRenamed('tpep_pickup_datetime', 'pickup_datetime')\
             .withColumnRenamed('tpep_dropoff_datetime', 'dropoff_datetime')
@@ -52,7 +65,7 @@ df_result = spark.sql("""
   """)
 
 # write results to parquet
-df_result.coalesce(1).write.parquet('data/report/revenue/', mode='overwrite')
+df_result.coalesce(1).write.parquet(output, mode='overwrite')
 
 
 spark.stop()
