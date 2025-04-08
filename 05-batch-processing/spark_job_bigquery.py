@@ -17,6 +17,7 @@ spark = SparkSession.builder\
           .appName("test")\
           .getOrCreate()
 
+spark.conf.set('temporaryGcsBucket', 'dataproc-staging-europe-west3-597160595294-6nd4o8xn')
 df_green = spark.read.parquet(input_green)
 df_green = df_green\
             .withColumnRenamed('lpep_pickup_datetime', 'pickup_datetime')\
